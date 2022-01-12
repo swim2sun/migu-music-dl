@@ -1,7 +1,8 @@
 
 # MIGU-Music-dl: Download Migu Lossless Music  
 
----------------------------------------------
+--------------------------------------------------------------------------------
+![Publish Action](https://github.com/swim2sun/migu-music-dl/actions/workflows/publish.yml/badge.svg)
 
 ## Installation
 
@@ -12,6 +13,10 @@ $ pip install migu-music-dl
 
 Usage
 -----
+
+```shell
+$ migu-music-dl [OPTIONS] SEARCH_KEYWORD OUTPUT_DIR
+```
 
 
 For example:
