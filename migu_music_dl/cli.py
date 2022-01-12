@@ -1,16 +1,15 @@
 import os.path
-import re
-import sys
+from mimetypes import guess_extension
+
 import click
 import requests
-from urllib.parse import urlparse
-
-from mimetypes import guess_extension
-from .extenral_api import MiguMusicApi
 from prettytable import PrettyTable
+
+from .extenral_api import MiguMusicApi
 
 
 @click.command()
+@click.version_option()
 @click.option('-s', '--quality', default='SQ', help='Quality of the music',
               type=click.Choice(['SQ', 'HQ'], case_sensitive=False))
 @click.argument('keyword')
