@@ -7,6 +7,12 @@ repository = "https://github.com/swim2sun/migu-music-dl"
 readme = "README.rst"
 keywords = ["migu", "music", "咪咕", "无损音乐"]
 license = "GPL-3.0-only"
+packages = [
+  { include = "migu_music_dl" }
+]
+
+[tool.poetry.scripts]
+migu-music-dl = "migu_music_dl.cli: download"
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -21,5 +27,3 @@ pytest = "^5.2"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.scripts]
-migu-music-dl = "migu_music_dl.cli: download"
