@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "migu-music-dl"
-version = "0.1.0"
+version = "0.1.1"
 description = "Migu music downloader"
 authors = ["swim2sun <xiangyangyou@gmail.com>"]
 repository = "https://github.com/swim2sun/migu-music-dl"
