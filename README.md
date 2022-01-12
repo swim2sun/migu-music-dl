@@ -1,8 +1,9 @@
 
-# MIGU-Music-dl: Download Migu Lossless Music  
+# MIGU-Music-dl   
 
---------------------------------------------------------------------------------
 ![Publish Action](https://github.com/swim2sun/migu-music-dl/actions/workflows/publish.yml/badge.svg)
+
+Download Migu Lossless Music
 
 ## Installation
 
