@@ -1,13 +1,16 @@
 [tool.poetry]
 name = "migu-music-dl"
 version = "0.1.0"
-description = ""
-authors = ["noone <noone@mars.com>"]
+description = "Migu music downloader"
+authors = ["swim2sun <xiangyangyou@gmail.com>"]
+repository = "https://github.com/swim2sun/migu-music-dl"
+license = "GPL-3.0-only"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 requests = "^2.27.1"
 click = "^8.0.3"
+prettytable = "^3.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -15,3 +18,6 @@ pytest = "^5.2"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+migu-music-dl = "migu_music_dl.cli: download"

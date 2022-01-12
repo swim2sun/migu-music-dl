@@ -10,7 +10,7 @@ class MiguMusicApi:
     def __init__(self):
         self.session = requests.Session()
 
-    def search(self, key_word: str):
+    def search(self, key_word: str, quality: str = 'SQ'):
         params = {
             'ua': 'Android_migu',
             'version': '5.0.1',
@@ -35,6 +35,8 @@ class MiguMusicApi:
             image_items = song_info['imgItems']
             image_url = image_items[0]['img'] if len(image_items) > 0 else None
             tone_type = 'SQ&formatType=SQ&resourceType=E'
+            if quality == 'HQ':
+                tone_type = 'HQ&formatType=HQ&resourceType=2'
             download_url = f'http://218.205.239.34/MIGUM2.0/v1.0/content/sub/listenSong.do?toneFlag={tone_type}' \
                            f'&netType=00&copyrightId=0&&contentId={song_info["contentId"]}&channel=0'
             song = Song(id=song_info['id'],
