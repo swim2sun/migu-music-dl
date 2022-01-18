@@ -10,12 +10,12 @@ class MiguMusicApi:
     def __init__(self):
         self.session = requests.Session()
 
-    def search(self, key_word: str, quality: str = 'SQ'):
+    def search(self, key_word: str, page_number: int = 1, page_size: int = 10, quality: str = 'SQ'):
         params = {
             'ua': 'Android_migu',
             'version': '5.0.1',
-            'pageNo': 1,
-            'pageSize': 10,
+            'pageNo': page_number,
+            'pageSize': page_size,
             'text': key_word,
             'searchSwitch': '{"song":1,"album":0,"singer":0,"tagSong":0,"mvSong":0,"songlist":0,"bestShow":1}'
         }
@@ -46,4 +46,4 @@ class MiguMusicApi:
                         singers=singers,
                         albums=albums)
             songs.append(song)
-        return songs
+        return songs, total_count

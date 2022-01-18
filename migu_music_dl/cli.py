@@ -12,16 +12,26 @@ from .extenral_api import MiguMusicApi
 @click.version_option()
 @click.option('-s', '--quality', default='SQ', help='Quality of the music',
               type=click.Choice(['SQ', 'HQ'], case_sensitive=False))
+@click.option('-ps', '--page-size', default='20', help='Page size')
 @click.argument('keyword')
 @click.argument('output_dir')
-def download(quality, keyword, output_dir):
+def download(quality, keyword, output_dir, page_size):
     api = MiguMusicApi()
-    songs = api.search(keyword, quality)
-    if len(songs) == 0:
-        click.echo(click.style('No songs found', fg='red'))
-        return
-    show_songs(songs)
-    selected_songs = wait_select_songs(songs)
+    page_number = 1
+    selected_songs = []
+    while len(selected_songs) == 0:
+        songs, total_count = api.search(keyword, page_number=page_number, quality=quality)
+        if len(songs) == 0:
+            click.echo(click.style('No songs found', fg='red'))
+            return
+        show_songs(songs)
+        next_page = click.confirm('next page?', default=True)
+        if next_page:
+            page_number += 1
+            click.clear()
+            continue
+        selected_songs = wait_select_songs(songs)
+        break
     if len(selected_songs) == 0:
         click.echo(click.style('No songs selected', fg='red'))
         return
