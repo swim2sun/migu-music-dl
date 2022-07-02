@@ -18,6 +18,10 @@ tauri-build = { version = "1.0.0", features = [] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.0.0", features = ["api-all"] }
+reqwest = { version = "0.11", features = ["json", "blocking"] }
+tokio = { version = "1", features = ["full"] }
+urlencoding = "2.1.0"
+json = "*"
 
 [features]
 # by default Tauri runs in production mode
