@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import { Button, Layout, Menu, Input, Space, Table, notification, Select, Col, Row } from 'antd';
-import { OmitProps } from 'antd/lib/transfer/ListBody';
 import { DownloadOutlined } from '@ant-design/icons';
 import { open } from '@tauri-apps/api/dialog';
 import { appDir } from '@tauri-apps/api/path';
@@ -57,30 +56,7 @@ const App = () => {
   ];
 
 
-  const search = () => {
-    invoke('search', {
-      keyWord: keyWord,
-      pageNumber: pageNumber,
-      pageSize: pageSize,
-      quality: quality,
-    }).then(res => {
-      console.log("invoke return: ", res)
-      // data = res.data
-      const newData = res.songs.map(item => {
-        return {
-          key: item.id,
-          title: item.name,
-          artist: item.singers.map(singer => singer.name).join(', '),
-          album: item.albums.map(album => album.name).join(', '),
-          downloadUrl: item.download_url
-        }
-      })
-      setTotal(res.total)
-      console.log(total)
-      setData(newData)
-      setLoadings([])
-    });
-  }
+  
 
   const setLoading = (index, loading) => {
     setLoadings((prevLoadings) => {
@@ -124,6 +100,30 @@ const App = () => {
   };
 
   useEffect(() => {
+    const search = () => {
+      invoke('search', {
+        keyWord: keyWord,
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+        quality: quality,
+      }).then(res => {
+        console.log("invoke return: ", res)
+        // data = res.data
+        const newData = res.songs.map(item => {
+          return {
+            key: item.id,
+            title: item.name,
+            artist: item.singers.map(singer => singer.name).join(', '),
+            album: item.albums.map(album => album.name).join(', '),
+            downloadUrl: item.download_url
+          }
+        })
+        setTotal(res.total)
+        console.log(total)
+        setData(newData)
+        setLoadings([])
+      });
+    }
     search()
   }, [pageNumber, keyWord, quality])
 
