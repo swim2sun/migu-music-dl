@@ -119,7 +119,6 @@ const App = () => {
           }
         })
         setTotal(res.total)
-        console.log(total)
         setData(newData)
         setLoadings([])
       });
