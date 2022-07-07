@@ -20,6 +20,6 @@ fn search(key_word: &str, page_number: u8, page_size: u8, quality: &str) -> Resu
 }
 
 #[tauri::command]
-fn download(name: &str, url: &str, path: &str) -> Result<(), String> {
+async fn download(name: &str, url: &str, path: &str) -> Result<(), String> {
     app::download(name, url, path)
 }
