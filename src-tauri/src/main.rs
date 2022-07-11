@@ -4,6 +4,7 @@
 )]
 
 use app::Page;
+use tauri_plugin_store::PluginBuilder;
 use tauri::{AboutMetadata, CustomMenuItem, Menu, MenuItem, Submenu};
 
 fn main() {
@@ -24,6 +25,7 @@ fn main() {
             _ => {}
         })
         .invoke_handler(tauri::generate_handler![search, download])
+        .plugin(PluginBuilder::default().build())
         .run(context)
         .expect("error while running tauri application");
 }

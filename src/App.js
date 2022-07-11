@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Store } from 'tauri-plugin-store-api';
 import './App.css';
 import { Button, Layout, Menu, Input, Space, Table, notification, Select, Col, Row, Modal, Form } from 'antd';
 import { DownloadOutlined, FolderOpenOutlined } from '@ant-design/icons';
@@ -10,6 +11,7 @@ const { Search } = Input;
 const { Option } = Select;
 
 const invoke = window.__TAURI__.invoke
+const store = new Store('.settings.dat')
 
 const openNotification = (title, message, type) => {
   notification[type]({
@@ -26,8 +28,15 @@ const App = () => {
   const [total, setTotal] = useState(0);
   const [loadings, setLoadings] = useState([]);
   const [showPreferences, setShowPreferences] = useState(false);
-  const [downloadPath, setDownloadPath] = useState(''); // todo: read from storage
+  const [downloadPath, setDownloadPath] = useState('');
   const pageSize = 20;
+
+  store.get('download-path').then((value) => {
+    console.log("stored path:", value)
+    if (value) {
+      setDownloadPath(value)
+    }
+  });
 
   const columns = [
     {
@@ -74,7 +83,7 @@ const App = () => {
     console.log('download: ', title, url)
     setLoading(index, true)
     openNotification("Downloading", "Downloading " + title, "info")
-    invoke('download', { name: title, url: url, path: downloadPath}).then(() => {
+    invoke('download', { name: title, url: url, path: downloadPath }).then(() => {
       openNotification('Download Success', `${title} download success`, "success")
       setLoading(index, false)
     })
@@ -92,17 +101,15 @@ const App = () => {
         }
         console.log('selectedPath: ', selectedPath)
         setDownloadPath(selectedPath)
+        store.set('download-path', downloadPath)
       })
     }
-    if (downloadPath != '') {
+    if (downloadPath !== '') {
       openSelectWindow(downloadPath)
       return;
     }
     appDir().then(openSelectWindow)
   }
-
-
-
 
   const onSearch = (value) => {
     console.log('search: ', value)
@@ -213,8 +220,11 @@ const App = () => {
       <Modal
         title="Preferences"
         visible={showPreferences}
-        onCancel={() => setShowPreferences(false)}
-        okText="Save"
+        footer={
+          <Button onClick={() => setShowPreferences(false)}>
+            Close
+          </Button>
+        }
       >
         {/* < /> */}
         <Form
