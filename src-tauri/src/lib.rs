@@ -1,7 +1,6 @@
 use std::{fs::File, path::Path, io::{Read, Write}};
 
-use serde::ser::{Serialize, SerializeMap, SerializeStruct, Serializer};
-use tokio::io::copy;
+use serde::ser::{Serialize, SerializeMap, Serializer};
 use urlencoding::encode;
 
 #[derive(Debug)]
