@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import { Button, Layout, Menu, Input, Space, Table, notification, Select, Col, Row } from 'antd';
-import { DownloadOutlined } from '@ant-design/icons';
+import { Button, Layout, Menu, Input, Space, Table, notification, Select, Col, Row, Modal, Form } from 'antd';
+import { DownloadOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import { open } from '@tauri-apps/api/dialog';
 import { appDir } from '@tauri-apps/api/path';
+import { listen } from '@tauri-apps/api/event'
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
 const { Option } = Select;
@@ -24,6 +25,8 @@ const App = () => {
   const [keyWord, setKeyWord] = useState('');
   const [total, setTotal] = useState(0);
   const [loadings, setLoadings] = useState([]);
+  const [showPreferences, setShowPreferences] = useState(false);
+  const [downloadPath, setDownloadPath] = useState(''); // todo: read from storage
   const pageSize = 20;
 
   const columns = [
@@ -54,9 +57,6 @@ const App = () => {
       ),
     },
   ];
-
-
-  
 
   const setLoading = (index, loading) => {
     setLoadings((prevLoadings) => {
@@ -89,6 +89,23 @@ const App = () => {
     })
   };
 
+  const selectFolder = () => {
+    appDir().then(dir => {
+      open({
+        directory: true,
+        multiple: false,
+        defaultPath: dir,
+      }).then(selectedPath => {
+        if (!selectedPath) {
+          return;
+        }
+        console.log('selectedPath: ', selectedPath)
+        setDownloadPath(selectedPath)
+      })
+    })
+  }
+
+
   const onSearch = (value) => {
     console.log('search: ', value)
     setKeyWord(value)
@@ -99,7 +116,14 @@ const App = () => {
     setPageNumber(value)
   };
 
+  listen('show-preferences', event => {
+    setShowPreferences(true)
+  })
+
   useEffect(() => {
+    if (keyWord === '') {
+      return
+    }
     const search = () => {
       invoke('search', {
         keyWord: keyWord,
@@ -108,7 +132,6 @@ const App = () => {
         quality: quality,
       }).then(res => {
         console.log("invoke return: ", res)
-        // data = res.data
         const newData = res.songs.map(item => {
           return {
             key: item.id,
@@ -144,21 +167,21 @@ const App = () => {
       >
         <Row style={{ marginTop: '20px', marginBottom: '20px' }}>
           <Col span={4} >
-              <Select
-                labelInValue
-                defaultValue={{
-                  value: 'SQ',
-                  label: '无损',
-                }}
-                style={{ width: '80%' }}
-                onChange={(opt) => {
-                  console.log('qualit: ', opt.value)
-                  setQuality(opt.value)
-                }}
-              >
-                <Option value="SQ">无损</Option>
-                <Option value="HQ">高品质</Option>
-              </Select>
+            <Select
+              labelInValue
+              defaultValue={{
+                value: 'SQ',
+                label: '无损',
+              }}
+              style={{ width: '80%' }}
+              onChange={(opt) => {
+                console.log('qualit: ', opt.value)
+                setQuality(opt.value)
+              }}
+            >
+              <Option value="SQ">无损</Option>
+              <Option value="HQ">高品质</Option>
+            </Select>
           </Col>
           <Col span={20}>
             <Search
@@ -189,6 +212,31 @@ const App = () => {
       >
         Migu Music DL ©2022 Created by <a href='https://github.com/swim2sun/migu-music-dl'>swim2sun</a>
       </Footer>
+      <Modal
+        title="Preferences"
+        visible={showPreferences}
+        onCancel={() => setShowPreferences(false)}
+        okText="Save"
+      >
+        {/* < /> */}
+        <Form
+          name="basic"
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 18 }}
+          initialValues={{ remember: true }}
+          autoComplete="off"
+        >
+          <Form.Item
+            label="Download Folder"
+            name="folder"
+          >
+            <Input.Group compact>
+              <Input disabled={true} style={{ width: 'calc(100% - 100px)' }} value={downloadPath} prefix={<FolderOpenOutlined />}/>
+              <Button type="primary" onClick={selectFolder}>Select</Button>
+            </Input.Group>
+          </Form.Item>
+        </Form>
+      </Modal>
     </Layout>
   )
 }
