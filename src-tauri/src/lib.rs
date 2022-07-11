@@ -1,4 +1,4 @@
-use std::{fs::File, path::Path, io::{Read, Write}};
+use std::{fs::File, io::Cursor, path::Path};
 
 use serde::ser::{Serialize, SerializeMap, Serializer};
 use urlencoding::encode;
@@ -160,10 +160,15 @@ pub fn search(
     })
 }
 
-pub fn download(name: &str, url: &str, path: &str) -> Result<(), String> {
+pub async fn download(name: &str, url: &str, path: &str) -> Result<(), String> {
     println!("download {} {} {}", name, url, path);
-    let mut resp = reqwest::blocking::get(url).unwrap();
-    let content_type = resp.headers().get("Content-Type").unwrap().to_str().unwrap();
+    let resp = reqwest::get(url).await.unwrap();
+    let content_type = resp
+        .headers()
+        .get("Content-Type")
+        .unwrap()
+        .to_str()
+        .unwrap();
     println!("content_type: {}", content_type);
     let mime_sub_type = content_type.split("/").nth(1).unwrap();
     let mut extension = "mp3";
@@ -174,13 +179,8 @@ pub fn download(name: &str, url: &str, path: &str) -> Result<(), String> {
     }
     let file_path = Path::new(path).join(format!("{}.{}", name, extension));
     let mut file = File::create(file_path).unwrap();
-    let mut buf = [0; 1024];
-    while let Ok(len) = resp.read(&mut buf) {
-        if len == 0 {
-            break;
-        }
-        file.write_all(&buf[..len]).unwrap();
-    }
+    let mut content = Cursor::new(resp.bytes().await.unwrap());
+    std::io::copy(&mut content, &mut file);
     Ok(())
 }
 

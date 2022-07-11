@@ -67,34 +67,25 @@ const App = () => {
   }
 
   const download = (title, url, index) => {
+    if (!downloadPath || downloadPath === '') {
+      setShowPreferences(true);
+      return;
+    }
     console.log('download: ', title, url)
     setLoading(index, true)
-    appDir().then(dir => {
-      open({
-        directory: true,
-        multiple: false,
-        defaultPath: dir,
-      }).then(selectedPath => {
-        if (!selectedPath) {
-          setLoading(index, false)
-          return;
-        }
-        console.log('selectedPath: ', selectedPath)
-        openNotification("Downloading", "Downloading " + title, "info")
-        invoke('download', { name: title, url: url, path: selectedPath }).then(() => {
-          openNotification('Download Success', `${title} download success`, "success")
-          setLoading(index, false)
-        })
-      })
+    openNotification("Downloading", "Downloading " + title, "info")
+    invoke('download', { name: title, url: url, path: downloadPath}).then(() => {
+      openNotification('Download Success', `${title} download success`, "success")
+      setLoading(index, false)
     })
   };
 
   const selectFolder = () => {
-    appDir().then(dir => {
+    const openSelectWindow = (defaultDir) => {
       open({
         directory: true,
         multiple: false,
-        defaultPath: dir,
+        defaultPath: defaultDir,
       }).then(selectedPath => {
         if (!selectedPath) {
           return;
@@ -102,8 +93,15 @@ const App = () => {
         console.log('selectedPath: ', selectedPath)
         setDownloadPath(selectedPath)
       })
-    })
+    }
+    if (downloadPath != '') {
+      openSelectWindow(downloadPath)
+      return;
+    }
+    appDir().then(openSelectWindow)
   }
+
+
 
 
   const onSearch = (value) => {
@@ -231,7 +229,7 @@ const App = () => {
             name="folder"
           >
             <Input.Group compact>
-              <Input disabled={true} style={{ width: 'calc(100% - 100px)' }} value={downloadPath} prefix={<FolderOpenOutlined />}/>
+              <Input disabled={true} style={{ width: 'calc(100% - 100px)' }} value={downloadPath} prefix={<FolderOpenOutlined />} />
               <Button type="primary" onClick={selectFolder}>Select</Button>
             </Input.Group>
           </Form.Item>
