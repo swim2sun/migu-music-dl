@@ -11,7 +11,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "tauri-plugin-store-api": "github:tauri-apps/tauri-plugin-store#dev",
+    "tauri-plugin-store-api": "git+https://github.com/tauri-apps/tauri-plugin-store#dev",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
