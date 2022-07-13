@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Store } from 'tauri-plugin-store-api';
 import './App.css';
-import { Button, Layout, Menu, Input, Space, Table, notification, Select, Col, Row, Modal, Form } from 'antd';
+import { Button, Layout, Menu, Input, Space, Table, notification, Select, Col, Row, Modal, Form, Switch } from 'antd';
 import { DownloadOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import { open } from '@tauri-apps/api/dialog';
-import { appDir } from '@tauri-apps/api/path';
+import { appDir, sep } from '@tauri-apps/api/path';
 import { listen } from '@tauri-apps/api/event'
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -29,7 +29,23 @@ const App = () => {
   const [loadings, setLoadings] = useState([]);
   const [showPreferences, setShowPreferences] = useState(false);
   const [downloadPath, setDownloadPath] = useState('');
+  const [createArtistFolder, setCreateArtistFolder] = useState(false);
+  const [createAlbumFolder, setCreateAlbumFolder] = useState(false);
   const pageSize = 20;
+
+  store.get('create-artist-folder').then((value) => {
+    console.log("stored create-artist-folder:", value)
+    if (value) {
+      setCreateArtistFolder(value)
+    }
+  });
+
+  store.get('create-album-folder').then((value) => {
+    console.log("stored create-album-folder:", value)
+    if (value) {
+      setCreateAlbumFolder(value)
+    }
+  });
 
   store.get('download-path').then((value) => {
     console.log("stored path:", value)
@@ -59,9 +75,9 @@ const App = () => {
       title: 'Action',
       key: 'downloadUrl',
       dataIndex: 'downloadUrl',
-      render: (_, { title, downloadUrl }, index) => (
+      render: (_, { title, downloadUrl, artist, album }, index) => (
         <Space size="middle">
-          <Button onClick={() => download(title, downloadUrl, index)} loading={loadings[index]} type="primary" shape="circle" icon={<DownloadOutlined />} size='small' />
+          <Button onClick={() => download(title, downloadUrl, index, artist, album)} loading={loadings[index]} type="primary" shape="circle" icon={<DownloadOutlined />} size='small' />
         </Space>
       ),
     },
@@ -75,7 +91,7 @@ const App = () => {
     });
   }
 
-  const download = (title, url, index) => {
+  const download = (title, url, index, artist, album) => {
     if (!downloadPath || downloadPath === '') {
       setShowPreferences(true);
       return;
@@ -83,7 +99,14 @@ const App = () => {
     console.log('download: ', title, url)
     setLoading(index, true)
     openNotification("Downloading", "Downloading " + title, "info")
-    invoke('download', { name: title, url: url, path: downloadPath }).then(() => {
+    var targetPath = downloadPath;
+    if (createArtistFolder) {
+      targetPath = targetPath + sep + artist;
+    }
+    if (createAlbumFolder) {
+      targetPath = targetPath + sep + album;
+    }
+    invoke('download', { name: title, url: url, path: targetPath }).then(() => {
       openNotification('Download Success', `${title} download success`, "success")
       setLoading(index, false)
     })
@@ -101,7 +124,7 @@ const App = () => {
         }
         console.log('selectedPath: ', selectedPath)
         setDownloadPath(selectedPath)
-        store.set('download-path', downloadPath)
+        store.set('download-path', selectedPath)
       })
     }
     if (downloadPath !== '') {
@@ -242,6 +265,18 @@ const App = () => {
               <Input disabled={true} style={{ width: 'calc(100% - 100px)' }} value={downloadPath} prefix={<FolderOpenOutlined />} />
               <Button type="primary" onClick={selectFolder}>Select</Button>
             </Input.Group>
+          </Form.Item>
+          <Form.Item
+            label="Artist Folder"
+            name="artistFolder"
+          >
+            <Switch checked={createArtistFolder} onChange={(value) => { store.set('create-artist-folder', value); setCreateArtistFolder(value) }} />
+          </Form.Item>
+          <Form.Item
+            label="Album Folder"
+            name="albumFolder"
+          >
+            <Switch checked={createAlbumFolder} onChange={(value) => { store.set('create-album-folder', value); setCreateAlbumFolder(value) }} />
           </Form.Item>
         </Form>
       </Modal>

@@ -1,4 +1,4 @@
-use std::{fs::File, io::Cursor, path::Path};
+use std::{fs::{File, self}, io::Cursor, path::Path};
 
 use serde::ser::{Serialize, SerializeMap, Serializer};
 use urlencoding::encode;
@@ -177,7 +177,11 @@ pub async fn download(name: &str, url: &str, path: &str) -> Result<(), String> {
         "x-flac" => extension = "flac",
         _ => (),
     }
-    let file_path = Path::new(path).join(format!("{}.{}", name, extension));
+    let folder_path = Path::new(path);
+    if !folder_path.exists() {
+        fs::create_dir_all(folder_path).unwrap();
+    }
+    let file_path = folder_path.join(format!("{}.{}", name, extension));
     let mut file = File::create(file_path).unwrap();
     let mut content = Cursor::new(resp.bytes().await.unwrap());
     std::io::copy(&mut content, &mut file);
