@@ -1,6 +1,6 @@
 {
   "name": "migu-music-dl",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "dependencies": {
     "@tauri-apps/api": "^1.0.0",
